@@ -1,4 +1,6 @@
 from time import strftime
+import datetime
+
 
 def convert_station_id( station_id ):
     """
@@ -59,5 +61,45 @@ def function_to_call( results ):
         }
     """
     results.put(None)
+    converted_results = []
+
     for r in iter(results.get, None):
-        pass
+        station = {}
+        current_dict = {}
+        station[r['station']] = [current_dict]
+        current_dict['timestamp'] = r['timestamp']
+        current_dict['lines'] = {}
+        stop_events = filter(lambda elem:
+                             elem['transportation']['product']['name']
+                             == 'S-Bahn', r['results']['stopEvents'])
+        for st_event in stop_events:
+            departure_dict = {}
+            # print st_event
+            if 'isRealtimeControlled' in st_event:
+                departure_dict['isRealtimeControlled'] = st_event['isRealtimeControlled']
+            else:
+                departure_dict['isRealtimeControlled'] = False
+
+            if 'isRealtimeControlled' in departure_dict and 'departureTimeEstimated' in st_event:
+                departure_dict['departureTimeEstimated'] = st_event['departureTimeEstimated']
+            # else:
+            #     departure_dict['departureTimeEstimated'] = None
+            departure_dict['departureTimePlanned'] = st_event['departureTimePlanned']
+            if 'infos' in st_event:
+                departure_dict['infos'] = []
+                for i in range(len(st_event['infos'])):
+                    info['content'] = st_event['infos'][i]['content']
+                    info['title'] = st_event['infos'][i]['title']
+                    info['subtitle'] = st_event['infos'][i]['subtitle']
+                    info['properties'] = st_event['infos'][i]['properties']
+                    departure_dict['infos'].append(info)
+            line = st_event['transportation']['number']
+            departure_dict['name'] = st_event['transportation']['product']['name']
+            departure_dict['class'] = st_event['transportation']['product']['class']
+
+            if line in current_dict['lines']:
+                current_dict['lines'][line].append(departure_dict)
+            else:
+                current_dict['lines'][line] = [departure_dict]
+
+        converted_results.append(current_dict)
