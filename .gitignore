@@ -1,1 +1,5 @@
 *.pyc
+LICENSE
+README.md
+vcap-local.json
+
