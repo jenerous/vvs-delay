@@ -25,6 +25,7 @@ class Crawler( object ):
     def __init__( self ):
         self.apis = {}
         self.intervals = {}
+        self.db = None
         self.quiet = False
 
     def log( self, msg, level='INFO', log=False, force_print=False ):
@@ -127,6 +128,15 @@ class Crawler( object ):
                 self.intervals[interval] = []
 
             self.intervals[interval].append(name)
+
+    def add_db(self, db):
+        """
+            register db connection
+            @param db: database object 
+        """
+        self.log("Registered DB")
+        self.db = db
+
 
     def crawl( self, api, timestamp, station ):
         """
