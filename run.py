@@ -1,9 +1,12 @@
+#!/usr/bin/python
+
 from cloudant import Cloudant
 from flask import Flask, render_template, request, jsonify
 import atexit
 import cf_deployment_tracker
 import os
 import json
+import threading
 from crawler import Crawler
 
 # Emit Bluemix deployment event
@@ -11,9 +14,9 @@ cf_deployment_tracker.track()
 
 app = Flask(__name__)
 
-db_name = 'vvs-delay-db'
+data_base_name = 'vvs-delay-db'
 client = None
-db = None
+data_base = None
 
 if 'VCAP_SERVICES' in os.environ:
     vcap = json.loads(os.getenv('VCAP_SERVICES'))
@@ -24,7 +27,7 @@ if 'VCAP_SERVICES' in os.environ:
         password = creds['password']
         url = 'https://' + creds['host']
         client = Cloudant(user, password, url=url, connect=True)
-        db = client.create_database(db_name, throw_on_exists=False)
+        data_base = client.create_database(data_base_name, throw_on_exists=False)
 elif os.path.isfile('vcap-local.json'):
     with open('vcap-local.json') as f:
         vcap = json.load(f)
@@ -34,34 +37,39 @@ elif os.path.isfile('vcap-local.json'):
         password = creds['password']
         url = 'https://' + creds['host']
         client = Cloudant(user, password, url=url, connect=True)
-        db = client.create_database(db_name, throw_on_exists=False)
+        data_base = client.create_database(data_base_name, throw_on_exists=False)
 
 # On Bluemix, get the port number from the environment variable PORT
 # When running this app on the local machine, default the port to 8080
 port = int(os.getenv('PORT', 8080))
 
-@app.route('/')
-def home():
-    return render_template('index.html')
 
 def main():
-    app.run(host='0.0.0.0', port=port, debug=True)
+    global runner
 
-    # get a crawler instance
+    # # get a crawler instance
     crawler = Crawler()
 
     # import the api to use
     from crawler.crawlerhelpers import efa_beta
 
     # register api
-    crawler.add_api( efa_beta.get_name(), efa_beta.get_base_url(), get_params_function=efa_beta.get_params, function_to_call=efa_beta.function_to_call)
+    crawler.add_api( efa_beta.get_name(), efa_beta.get_base_url(), get_params_function=efa_beta.get_params, function_to_call=efa_beta.function_to_call, db=data_base)
 
     # run apis with the following station ids
     station_ids = ['6008']
-    crawler.run(station_ids)
+    runner = threading.Thread(target=crawler.run, args=(station_ids))
+    runner.start()
+    flask_app = threading.Thread(target=app.run, kwargs={'host':'0.0.0.0', 'port':port, 'debug':True})
+    flask_app.start()
+    crawler.log('Crawler is running', log=True)
+
+
 
 @atexit.register
 def shutdown():
+    if runner:
+        runner.join()
     if client:
         client.disconnect()
 

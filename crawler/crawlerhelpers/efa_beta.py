@@ -46,8 +46,9 @@ def get_params( current_time_raw, station ):
             'version' : "10.2.2.48"
         }
 
-def function_to_call( results ):
+def function_to_call( results, db ):
     """
+        TODO DB SHOULD BE KEEPT SEPERATE
         function that gets called on an api response
         @param results: queue object of the api that contains result dicts from
         the api call.
@@ -60,4 +61,4 @@ def function_to_call( results ):
     """
     results.put(None)
     for r in iter(results.get, None):
-        pass
+        db.create_document(r)
