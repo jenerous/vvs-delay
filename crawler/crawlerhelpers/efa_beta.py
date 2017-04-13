@@ -1,6 +1,4 @@
 from time import strftime
-import datetime
-
 
 def convert_station_id( station_id ):
     """

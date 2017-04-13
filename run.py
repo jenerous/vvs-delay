@@ -1,13 +1,14 @@
-from flask import Flask, render_template, request, jsonify
+#!/usr/bin/python
+
+from cloudant import Cloudant
 import atexit
 import cf_deployment_tracker
 import os
+import threading
 from crawler import Crawler
 
 # Emit Bluemix deployment event
 cf_deployment_tracker.track()
-
-app = Flask(__name__)
 
 crawler = None
 
@@ -20,8 +21,7 @@ def home():
     return render_template('index.html')
 
 def main():
-    app.run(host='0.0.0.0', port=port, debug=False)
-
+    
     # get a crawler instance
     crawler = Crawler()
 
@@ -33,16 +33,22 @@ def main():
 
     # register api
     crawler.add_api( efa_beta.get_name(), efa_beta.get_base_url(), get_params_function=efa_beta.get_params, function_to_call=efa_beta.function_to_call)
+    
     crawler.set_db_session(cloudant_db.get_db_session('vcap-local.json'), 'vvs-delay-db')
 
     # run apis with the following station ids
     station_ids = ['6008']
-    crawler.run(station_ids)
+    runner = threading.Thread(target=crawler.run, args=(station_ids))
+    runner.start()
+    crawler.log('Crawler is running', log=True)
+
+
 
 @atexit.register
 def shutdown():
-    if crawler:
-        crawler.close_db_session()
+    if runner:
+        runner.join()
+    crawler.close_db_session()
 
 if __name__ == '__main__':
     main()
