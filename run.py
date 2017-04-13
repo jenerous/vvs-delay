@@ -12,16 +12,8 @@ cf_deployment_tracker.track()
 
 crawler = None
 
-# On Bluemix, get the port number from the environment variable PORT
-# When running this app on the local machine, default the port to 8080
-port = int(os.getenv('PORT', 8080))
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
 def main():
-    
+
     # get a crawler instance
     crawler = Crawler()
 
@@ -33,7 +25,7 @@ def main():
 
     # register api
     crawler.add_api( efa_beta.get_name(), efa_beta.get_base_url(), get_params_function=efa_beta.get_params, function_to_call=efa_beta.function_to_call)
-    
+
     crawler.set_db_session(cloudant_db.get_db_session('vcap-local.json'), 'vvs-delay-db')
 
     # run apis with the following station ids
@@ -41,7 +33,6 @@ def main():
     runner = threading.Thread(target=crawler.run, args=(station_ids))
     runner.start()
     crawler.log('Crawler is running', log=True)
-
 
 
 @atexit.register
