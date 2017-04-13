@@ -92,7 +92,7 @@ class Crawler( object ):
         else:
             return ''
 
-    def add_api( self, name, url, function_to_call=raw_return, get_params_function={}, interval=5, db=None ):
+    def add_api( self, name, url, function_to_call=raw_return, get_params_function={}, interval=5 ):
         """
             add an api to the crawler
             @param name: how shall the api be called. This is like an id!
@@ -101,8 +101,6 @@ class Crawler( object ):
             @get_params_function: function that gets called to build the api parameters
             @interval: define every x minutes the api shall be called
         """
-        if db is None:
-            self.error('No data base connection!')
 
         # ensure ints and minimum 1
         interval = int(interval) if int(interval) > 0 else 1
@@ -114,9 +112,7 @@ class Crawler( object ):
             self.apis[name] = {
                 'name': name,
                 'url': url,
-                'handle': function_to_call,
-                'db': db,
-                'interval': interval,
+                'handle': function_to_call,                'interval': interval,
                 'get_params': get_params_function,
                 'monitoring': {
                     'called': 0,
@@ -146,9 +142,10 @@ class Crawler( object ):
 
     def close_db_session(self):
         """
-            disconnect from database 
+            disconnect from database
         """
-        self.db_session.disconnect()
+        if self.db_session:
+            self.db_session.disconnect()
 
     def crawl( self, api, timestamp, station ):
         """
@@ -225,4 +222,4 @@ class Crawler( object ):
                         self.warning('{} needed {}. A normal value would be around {}'.format(n, time_needed, time_needed_normally))
                 self.apis[n]['monitoring']['time_consumption'].append(time_needed)
 
-                self.apis[n]['handle'](self.apis[n]['queue'], self.apis[n]['db'])
+                self.apis[n]['handle'](self.apis[n]['queue'])

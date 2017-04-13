@@ -11,8 +11,10 @@ from crawler import Crawler
 cf_deployment_tracker.track()
 
 crawler = None
+runner  = None
 
 def main():
+    global crawler, runner
 
     # get a crawler instance
     crawler = Crawler()
@@ -37,6 +39,8 @@ def main():
 
 @atexit.register
 def shutdown():
+    global crawler, runner
+
     if runner:
         runner.join()
     crawler.close_db_session()

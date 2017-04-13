@@ -11,15 +11,14 @@ def get_db_session(cred_file):
         print('Found VCAP_SERVICES')
         if 'cloudantNoSQLDB' in vcap:
             creds = vcap['cloudantNoSQLDB'][0]['credentials']
-            url = 'https://' + creds['host']
-
+    
     elif os.path.isfile(cred_file):
         with open(cred_file) as f:
             vcap = json.load(f)
             print('Found local VCAP_SERVICES')
             creds = vcap['services']['cloudantNoSQLDB'][0]['credentials']
-            url = 'http://' + creds['host'] + ':' + creds['port']
 
+    url = 'https://' + creds['host']
     user = creds['username']
     password = creds['password']
     client = Cloudant(user, password, url=url, connect=True)
