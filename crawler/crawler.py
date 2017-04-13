@@ -166,7 +166,7 @@ class Crawler( object ):
             start the call loop
             @param SIDs: station ids as list
         """
-        unique_intervals = np.unique([self.apis[x]['interval'] for x in self.apis])
+        unique_intervals = np.array(self.intervals.keys(), dtype=np.int)
         unique_intervals = unique_intervals.reshape((1, unique_intervals.shape[0]))
         intervals = np.repeat(unique_intervals, 2, axis=0)
 

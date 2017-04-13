@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 from cloudant import Cloudant
-from flask import Flask, render_template, request, jsonify
 import atexit
 import cf_deployment_tracker
 import os
@@ -11,8 +10,6 @@ from crawler import Crawler
 
 # Emit Bluemix deployment event
 cf_deployment_tracker.track()
-
-app = Flask(__name__)
 
 data_base_name = 'vvs-delay-db'
 client = None
@@ -39,11 +36,6 @@ elif os.path.isfile('vcap-local.json'):
         client = Cloudant(user, password, url=url, connect=True)
         data_base = client.create_database(data_base_name, throw_on_exists=False)
 
-# On Bluemix, get the port number from the environment variable PORT
-# When running this app on the local machine, default the port to 8080
-port = int(os.getenv('PORT', 8080))
-
-
 def main():
     global runner
 
@@ -60,8 +52,6 @@ def main():
     station_ids = ['6008']
     runner = threading.Thread(target=crawler.run, args=(station_ids))
     runner.start()
-    flask_app = threading.Thread(target=app.run, kwargs={'host':'0.0.0.0', 'port':port, 'debug':True})
-    flask_app.start()
     crawler.log('Crawler is running', log=True)
 
 

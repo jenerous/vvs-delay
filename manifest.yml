@@ -1,5 +1,5 @@
 ---
 applications:
  - name: vvs-delay-crawler
-   random-route: true
+   no-route: true
    memory: 128M
