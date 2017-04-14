@@ -65,8 +65,9 @@ def function_to_call( results ):
         station = {}
         current_dict = {}
         station[r['station']] = [current_dict]
-        current_dict['timestamp'] = r['timestamp']
+        current_dict['timestamp'] = r['timestamp']  # "2017-04-14 TEST"
         current_dict['lines'] = {}
+
         stop_events = filter(lambda elem:
                              elem['transportation']['product']['name']
                              == 'S-Bahn', r['results']['stopEvents'])
@@ -86,6 +87,7 @@ def function_to_call( results ):
             if 'infos' in st_event:
                 departure_dict['infos'] = []
                 for i in range(len(st_event['infos'])):
+                    info = {}
                     info['content'] = st_event['infos'][i]['content']
                     info['title'] = st_event['infos'][i]['title']
                     info['subtitle'] = st_event['infos'][i]['subtitle']
@@ -100,4 +102,8 @@ def function_to_call( results ):
             else:
                 current_dict['lines'][line] = [departure_dict]
 
-        converted_results.append(current_dict)
+        converted_results.append(station)
+    # print "Results: "
+    # with open("results.json", 'w') as output:
+    #     json.dump(converted_results, output, indent=4)
+    # pprint(converted_results)
