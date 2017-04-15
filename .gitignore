@@ -29,9 +29,10 @@ var/
 .installed.cfg
 *.egg
 
-# python virtual environment/compiled files
+# python virtual environment/compiled files/autogen
 venv/
 *.pyc
+*.orig
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

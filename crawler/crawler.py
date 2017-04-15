@@ -61,7 +61,6 @@ class Crawler( object ):
             @param msg: the text message that shall be printed
         """
         self.log( msg, level='WARNING', log=True )
-        sys.exit(1)
 
     def error( self, msg ):
         """

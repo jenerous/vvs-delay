@@ -19,14 +19,15 @@ def main():
     # get a crawler instance
     crawler = Crawler()
 
-    # import the api to use
-    from crawler.crawlerhelpers import efa_beta
+    # import the apis to use
+    from crawler.crawlerhelpers.efa_beta import API_efaBeta
+    api_efa_beta = API_efaBeta()
+
+    # register api
+    crawler.add_api( api_efa_beta.name, api_efa_beta.baseurl, get_params_function=api_efa_beta.get_params, function_to_call=api_efa_beta.function_to_call)
 
     #import the db to use
     from crawler.crawlerhelpers import cloudant_db
-
-    # register api
-    crawler.add_api( efa_beta.get_name(), efa_beta.get_base_url(), get_params_function=efa_beta.get_params, function_to_call=efa_beta.function_to_call)
 
     crawler.set_db_session(cloudant_db.get_db_session('vcap-local.json'), 'vvs-delay-db')
 
