@@ -24,7 +24,7 @@ def main():
     api_efa_beta = API_efaBeta()
 
     # register api
-    crawler.add_api( api_efa_beta.name, api_efa_beta.baseurl, get_params_function=api_efa_beta.get_params, function_to_call=api_efa_beta.function_to_call)
+    crawler.add_api( api_efa_beta.name, api_efa_beta.baseurl, get_params_function=api_efa_beta.get_params, function_to_call=api_efa_beta.function_to_call, interval=1)
 
     #import the db to use
     from crawler.crawlerhelpers import cloudant_db
@@ -33,7 +33,7 @@ def main():
 
     # run apis with the following station ids
     station_ids = ['6008']
-    runner = threading.Thread(target=crawler.run, args=(station_ids))
+    runner = threading.Thread(target=crawler.run, args=(station_ids, ))
     runner.start()
     crawler.log('Crawler is running', log=True)
 
