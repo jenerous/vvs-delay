@@ -180,13 +180,13 @@ class Crawler( object ):
             start the call loop
             @param SIDs: station ids as list
         """
+
         unique_intervals = np.array(self.intervals.keys(), dtype=np.int)
         unique_intervals = unique_intervals.reshape((1, unique_intervals.shape[0]))
         intervals = np.repeat(unique_intervals, 2, axis=0)
-
         while True:
             tick = intervals[0].min()
-            self.log('sleeping for {} minutes now'.format(tick), log=True)
+            self.log('sleeping for {} minute{} now'.format(tick, 's' if tick > 1 else ''), log=True)
             sys.stdout.flush()
 
             sleep(tick * ONE_MINUTE_IN_SECONDS)
@@ -204,8 +204,7 @@ class Crawler( object ):
                 timestamp = time()
                 self.apis[n]['monitoring']['started_last'] = timestamp
                 self.apis[n]['monitoring']['called'] += 1
-
-                self.apis[n]['threads'] = [threading.Thread(target=self.crawl, args=(self.apis[n], gmtime(timestamp), SID)) for SID in SIDs]
+                self.apis[n]['threads'] = [threading.Thread(target=self.crawl, args=(self.apis[n], gmtime(timestamp), SID, )) for SID in SIDs]
                 for t in self.apis[n]['threads']:
                     t.start()
 
@@ -221,4 +220,6 @@ class Crawler( object ):
                         self.warning('{} needed {}. A normal value would be around {}'.format(n, time_needed, time_needed_normally))
                 self.apis[n]['monitoring']['time_consumption'].append(time_needed)
 
-                self.apis[n]['handle'](self.apis[n]['queue'])
+                converted_results = self.apis[n]['handle'](self.apis[n]['queue'])
+                for c in converted_results:
+                    self.db.create_document(c)
