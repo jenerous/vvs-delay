@@ -2,7 +2,14 @@ from crawler.crawlerhelpers import cloudant_db
 
 def test():
     failed = False
-    client = cloudant_db.get_db_session('vcap-local.json')
+    
+    try:
+        client = cloudant_db.get_db_session('vcap-local.json')
+        print "Loading credentials \t - check"
+    except:
+        failed = True
+        print "Loading credentials \t - fail"
+
     try:
         db = client.create_database('test')
     except:
