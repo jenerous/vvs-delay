@@ -111,7 +111,8 @@ class Crawler( object ):
             self.apis[name] = {
                 'name': name,
                 'url': url,
-                'handle': function_to_call,                'interval': interval,
+                'handle': function_to_call,
+                'interval': interval,
                 'get_params': get_params_function,
                 'monitoring': {
                     'called': 0,

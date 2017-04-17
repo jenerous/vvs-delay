@@ -24,7 +24,7 @@ def main():
     api_efa_beta = API_efaBeta()
 
     # register api
-    crawler.add_api( api_efa_beta.name, api_efa_beta.baseurl, get_params_function=api_efa_beta.get_params, function_to_call=api_efa_beta.function_to_call, interval=1)
+    crawler.add_api( api_efa_beta.name, api_efa_beta.baseurl, get_params_function=api_efa_beta.get_params, function_to_call=api_efa_beta.function_to_call)
 
     #import the db to use
     from crawler.crawlerhelpers import cloudant_db
