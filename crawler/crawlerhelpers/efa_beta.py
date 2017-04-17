@@ -5,6 +5,15 @@ class API_efaBeta(object):
         self.name = 'efaBeta'
         self.baseurl = 'https://www3.vvs.de/mngvvs/XML_DM_REQUEST'
 
+    def convert_station_id( self, station_id ):
+        """
+            convert station id that is given to the api specific
+            representation if necessary
+            @param station_id: id in general representation
+            @return id in api specific representation
+        """
+        return station_id
+
     def get_params( self, current_time_raw, station ):
         """
             @param current_time_raw: time as gmtime object
@@ -22,7 +31,7 @@ class API_efaBeta(object):
                 'itdTime' : itdTime,
                 'limit' : 50,
                 'mode' : "direct",
-                'name_dm' : "de:8111:{}".format(convert_station_id(station)),
+                'name_dm' : "de:8111:{}".format(self.convert_station_id(station)),
                 'outputFormat' : "rapidJSON",
                 'serverInfo' : "1",
                 'type_dm' : "any",
@@ -49,8 +58,11 @@ class API_efaBeta(object):
             station = {}
             current_dict = {}
             station[r['station']] = [current_dict]
-            current_dict['timestamp'] = r['timestamp']  # "2017-04-14 TEST"
+            current_dict['timestamp'] = strftime('%Y-%m-%dT%H:%M:%SZ', r['timestamp'])  # "2017-04-14 TEST"
             current_dict['lines'] = {}
+
+            if not 'results' in r or not 'stopEvents' in r['results']:
+                continue
 
             stop_events = filter(lambda elem:
                                  elem['transportation']['product']['name']
@@ -72,7 +84,11 @@ class API_efaBeta(object):
                     departure_dict['infos'] = []
                     for i in range(len(st_event['infos'])):
                         info = {}
-                        info['content'] = st_event['infos'][i]['content']
+                        if 'content' in st_event['infos'][i]:
+                            info['content'] = st_event['infos'][i]['content']
+                        else:
+                            info['content'] = ""
+
                         info['title'] = st_event['infos'][i]['title']
                         info['subtitle'] = st_event['infos'][i]['subtitle']
                         info['properties'] = st_event['infos'][i]['properties']
@@ -87,7 +103,9 @@ class API_efaBeta(object):
                     current_dict['lines'][line] = [departure_dict]
 
             converted_results.append(station)
+
         # print "Results: "
         # with open("results.json", 'w') as output:
         #     json.dump(converted_results, output, indent=4)
         # pprint(converted_results)
+        return converted_results
