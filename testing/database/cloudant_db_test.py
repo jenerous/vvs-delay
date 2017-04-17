@@ -5,10 +5,10 @@ def test():
     
     try:
         client = cloudant_db.get_db_session('vcap-local.json')
-        print "Loading credentials \t\t - check"
+        print "Loading credentials \t - check"
     except:
         failed = True
-        print "Loading credentials \t\t - fail"
+        print "Loading credentials \t - fail"
 
     try:
         db = client.create_database('test')
