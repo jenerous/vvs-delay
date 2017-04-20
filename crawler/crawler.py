@@ -173,7 +173,7 @@ class Crawler( object ):
         try:
             return json.loads(urllib2.urlopen(url).read())
         except urllib2.URLError:
-            self.warning('API call failed!\n>', url)
+            self.warning('API call failed!\n>' + url)
             return None
 
     def run( self, SIDs ):
