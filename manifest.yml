@@ -3,3 +3,4 @@ applications:
  - name: vvs-delay-crawler
    no-route: true
    memory: 128M
+   health-check-type: process
