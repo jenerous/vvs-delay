@@ -1,5 +1,10 @@
 from time import strftime
 
+
+def get_instance():
+    return API_efaBeta()
+
+
 class API_efaBeta(object):
     def __init__( self ):
         self.name = 'efaBeta'
@@ -64,9 +69,11 @@ class API_efaBeta(object):
             if not 'results' in r or not 'stopEvents' in r['results']:
                 continue
 
+            product_types = ['S-Bahn']
             stop_events = filter(lambda elem:
-                                 elem['transportation']['product']['name']
-                                 == 'S-Bahn', r['results']['stopEvents'])
+                                elem['transportation']['product']['name'] in product_types,
+                                r['results']['stopEvents'])
+
             for st_event in stop_events:
                 departure_dict = {}
                 # print st_event

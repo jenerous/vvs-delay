@@ -130,6 +130,8 @@ class Crawler( object ):
 
             self.intervals[interval].append(name)
 
+            self.log('Registered API ' + name)
+
     def set_db_session(self, client, db_name):
         """
             register db session, open/create database
@@ -187,7 +189,7 @@ class Crawler( object ):
         intervals = np.repeat(unique_intervals, 2, axis=0)
         while True:
             tick = intervals[0].min()
-            self.log('sleeping for {} minute{} now'.format(tick, 's' if tick > 1 else ''), log=True)
+            self.log('sleeping for {} minute{} now\n'.format(tick, 's' if tick > 1 else ''), log=True)
             sys.stdout.flush()
 
             sleep(tick * ONE_MINUTE_IN_SECONDS)

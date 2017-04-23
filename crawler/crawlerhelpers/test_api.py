@@ -1,3 +1,5 @@
+def get_instance():
+    return API_test()
 
 class API_test(object):
     """testing API class"""
