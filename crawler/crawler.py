@@ -186,7 +186,7 @@ class Crawler( object ):
                 if self.apis[n]['monitoring']['time_consumption']:
                     time_needed_normally = np.percentile(self.apis[n]['monitoring']['time_consumption'], 80)
                     if time_needed > time_needed_normally:
-                        self.warning('{} needed {}. A normal value would be around {}'.format(n, time_needed, time_needed_normally), do_print=(not self.quiet))
+                        self.warning('{} needed {}s. A normal value would be around {}s'.format(n, time_needed, time_needed_normally), do_print=(not self.quiet))
                 self.apis[n]['monitoring']['time_consumption'].append(time_needed)
 
                 converted_results = self.apis[n]['handle'](self.apis[n]['queue'])
