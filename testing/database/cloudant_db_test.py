@@ -2,86 +2,50 @@ from crawler.crawlerhelpers import cloudant_db
 
 def test():
     failed = False
-    
+    db = None
+
     try:
-        client = cloudant_db.get_db_session('vcap-local.json')
-        print "Loading credentials \t - check"
+        db = cloudant_db.CloudantDB('../../vcap-local.json', 'test')
+        print "Creating DB instance \t - check"
     except:
         failed = True
-        print "Loading credentials \t - fail"
+        print "Creating DB instance \t - fail"
+
+    #purge old data
+    doc1 = db.db['item1']
+    doc2 = db.db['item2']
+    if doc1.exists():
+        doc1.delete()
+    if doc2.exists():
+        doc2.delete()
 
     try:
-        db = client.create_database('test')
-    except:
-        client.delete_database('test')
-        db = client.create_database('test')
-    if db.exists():
-        print "DB Connection \t\t - check"
-    else:
-        failed = True
-        print "DB Connection \t\t - fail"
-
-    doc = db.create_document({
-        '_id': '1',
-        'name': 'Julia',
-        'age': 30,
-        'pets': ['cat', 'dog', 'frog']
-    })
-    if doc.exists():
-        print "Document creation \t - check"
-    else:
-        failed = True
-        print "Document creation \t - fail"
-
-    db.create_document({
-        '_id': '2',
-        'name': 'Hannah',
-        'age': 20,
-        'pets': ['cat', 'mouse']
-    })
-    db.create_document({
-        '_id': '3',
-        'name': 'Steffi',
-        'age': 77,
-        'children': ['Tom', 'Peter']
-    })
-
-    hannah = db['2']
-    if hannah.exists():
-        print "Document retrieval \t - check"
-    else:
-        failed = True
-        print "Document retrieval \t - fail"
-
-    hannah.update_field(hannah.field_set, 'age', 21)
-    hannah.update_field(hannah.list_field_append, 'pets', 'wombat')
-    hannah.fetch()
-    if (hannah['age'] == 21) & ('wombat' in hannah['pets']):
-        print "Document update \t - check"
-    else:
-        failed = True
-        print "Document update \t - fail"
-
-    hannah.delete()
-    if db.doc_count() == 2:
-        print "Document deletion \t - check"
-    else:
-        failed = True
-        print "Document update \t - fail"
-
-    try:
-        db.create_document({
-            '_id': '3',
-            'name': 'Ursel',
-            'age': 12,
+        data = []
+        data.append({
+            '_id': 'item1',
+            'name': 'Julia',
+            'age': 30,
+            'pets': ['cat', 'dog', 'frog']
         })
-        failed = True
-        print "Throw Key Error \t - fail"
-    except:
-        print "Throw Key Error \t - check"
+        data.append({
+            '_id': 'item2',
+            'name': 'Test',
+            'age': 20,
+            'pets': ['test']
+        })
+        db.write_to_db(data)
 
-    client.disconnect()
-    print "Disconnected from DB"
+        doc1 = db.db['item1']
+        doc2 = db.db['item2']
+        if doc1.exists() & doc2.exists():
+            print "Writing to DB \t\t - check"
+        else:
+            print "Writing to DB \t\t - fail"
+    except:
+        failed = True
+        print "Writing to DB \t\t - fail (Exception!)"
+
+    db.close_session()
 
     return failed
 
