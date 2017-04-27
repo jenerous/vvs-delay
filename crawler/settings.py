@@ -2,7 +2,7 @@
 QUIET = False
 
 # DB
-DB_NAME = "vvs-delay-db-dev"
+DB_NAME = "vvs-delay-db"
 
 # Crawling
 APIS = ["efa_beta"]

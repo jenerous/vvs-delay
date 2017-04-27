@@ -190,5 +190,7 @@ class Crawler( object ):
                 self.apis[n]['monitoring']['time_consumption'].append(time_needed)
 
                 converted_results = self.apis[n]['handle'](self.apis[n]['queue'])
-                for db in self.dbs.itervalues():
-                    db.write_to_db(converted_results)
+
+                if converted_results not is None:
+                    for db in self.dbs.itervalues():
+                        db.write_to_db(converted_results)
