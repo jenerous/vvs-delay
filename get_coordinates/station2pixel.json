@@ -1,0 +1,338 @@
+{
+  "Nellmersbach": [
+    13, 
+    10
+  ], 
+  "Stetten-Beinstein": [
+    13, 
+    23
+  ], 
+  "Hauptbahnhof": [
+    8, 
+    24
+  ], 
+  "Benningen (N)": [
+    9, 
+    1
+  ], 
+  "Tamm": [
+    3, 
+    0
+  ], 
+  "N\u00fcrnberger Stra\u00dfe": [
+    10, 
+    17
+  ], 
+  "Leonberg": [
+    2, 
+    16
+  ], 
+  "Maubach": [
+    14, 
+    6
+  ], 
+  "G\u00e4rtringen": [
+    3, 
+    60
+  ], 
+  "Grunbach": [
+    14, 
+    32
+  ], 
+  "B\u00f6blingen": [
+    4, 
+    52
+  ], 
+  "Weil der Stadt": [
+    0, 
+    34
+  ], 
+  "Kirchberg (M)": [
+    12, 
+    1
+  ], 
+  "Magstadt": [
+    2, 
+    33
+  ], 
+  "Schorndorf": [
+    15, 
+    47
+  ], 
+  "Maichingen Nord": [
+    3, 
+    38
+  ], 
+  "Herrenberg": [
+    2, 
+    66
+  ], 
+  "Stadtmitte": [
+    7, 
+    26
+  ], 
+  "Bietigheim-Bissingen": [
+    2, 
+    0
+  ], 
+  "Rohr": [
+    5, 
+    49
+  ], 
+  "Kornwestheim": [
+    6, 
+    4
+  ], 
+  "null": [
+    10, 
+    18
+  ], 
+  "Freiberg (N)": [
+    8, 
+    1
+  ], 
+  "Ludwigsburg": [
+    6, 
+    2
+  ], 
+  "Marbach (N)": [
+    10, 
+    1
+  ], 
+  "Winterbach": [
+    14, 
+    41
+  ], 
+  "Malmsheim": [
+    1, 
+    27
+  ], 
+  "Fellbach": [
+    11, 
+    18
+  ], 
+  "Rutesheim": [
+    2, 
+    20
+  ], 
+  "Echterdingen": [
+    6, 
+    61
+  ], 
+  "Kirchheim (T)": [
+    15, 
+    65
+  ], 
+  "Zuffenhausen": [
+    7, 
+    8
+  ], 
+  "Erdmannhausen": [
+    11, 
+    1
+  ], 
+  "Flughafen/Messe": [
+    7, 
+    64
+  ], 
+  "Renningen S\u00fcd": [
+    2, 
+    28
+  ], 
+  "H\u00f6flingen": [
+    3, 
+    13
+  ], 
+  "Ditzingen": [
+    4, 
+    9
+  ], 
+  "Ehningen": [
+    3, 
+    58
+  ], 
+  "Goldberg": [
+    5, 
+    51
+  ], 
+  "Neustadt-Hohenacker": [
+    12, 
+    16
+  ], 
+  "Rommelshausen": [
+    12, 
+    21
+  ], 
+  "Nufringen": [
+    2, 
+    63
+  ], 
+  "Favoritepark": [
+    7, 
+    1
+  ], 
+  "Neuwirtshaus (Porscheplatz)": [
+    6, 
+    8
+  ], 
+  "\u00d6sterfeld": [
+    6, 
+    43
+  ], 
+  "Untert\u00fcrkheim": [
+    11, 
+    25
+  ], 
+  "Bad Cannstatt": [
+    10, 
+    19
+  ], 
+  "Winnenden": [
+    13, 
+    11
+  ], 
+  "Beutelsbach": [
+    13, 
+    29
+  ], 
+  "Schwaikheim": [
+    13, 
+    14
+  ], 
+  "Obert\u00fcrkheim": [
+    11, 
+    30
+  ], 
+  "Sommerrain": [
+    11, 
+    17
+  ], 
+  "Schwabstra\u00dfe": [
+    6, 
+    35
+  ], 
+  "Maichingen": [
+    3, 
+    42
+  ], 
+  "Altbach": [
+    13, 
+    50
+  ], 
+  "Esslingen (N)": [
+    12, 
+    39
+  ], 
+  "Wendlingen (N)": [
+    14, 
+    59
+  ], 
+  "Neckarpark": [
+    10, 
+    22
+  ], 
+  "Renningen": [
+    1, 
+    23
+  ], 
+  "Geradstetten": [
+    14, 
+    37
+  ], 
+  "Feuerbach": [
+    7, 
+    12
+  ], 
+  "Leinfelden": [
+    6, 
+    57
+  ], 
+  "Waiblingen": [
+    12, 
+    17
+  ], 
+  "Burgstall (M)": [
+    13, 
+    3
+  ], 
+  "\u00d6tlingen": [
+    15, 
+    62
+  ], 
+  "Weilimdorf": [
+    4, 
+    7
+  ], 
+  "Endersbach": [
+    13, 
+    25
+  ], 
+  "Sindelfingen": [
+    4, 
+    48
+  ], 
+  "Feuersee": [
+    7, 
+    31
+  ], 
+  "Wernau (N)": [
+    14, 
+    56
+  ], 
+  "Plochingen": [
+    13, 
+    53
+  ], 
+  "Filderstadt": [
+    7, 
+    67
+  ], 
+  "Nordbahnhof": [
+    8, 
+    15
+  ], 
+  "Zell": [
+    13, 
+    48
+  ], 
+  "Aspberg": [
+    5, 
+    1
+  ], 
+  "Korntal": [
+    5, 
+    7
+  ], 
+  "Backnang": [
+    14, 
+    5
+  ], 
+  "Weiler": [
+    15, 
+    45
+  ], 
+  "Universit\u00e4t": [
+    6, 
+    40
+  ], 
+  "Vaihingen": [
+    6, 
+    46
+  ], 
+  "Hulb": [
+    4, 
+    55
+  ], 
+  "Oberaichen": [
+    6, 
+    54
+  ], 
+  "Mettingen": [
+    11, 
+    36
+  ], 
+  "Oberesslingen": [
+    12, 
+    44
+  ]
+}
