@@ -28,8 +28,7 @@ class Crawler( object ):
     def __init__( self ):
         self.apis = {}
         self.intervals = {}
-        self.db_session = None
-        self.db = None
+        self.dbs = {}
         self.quiet = settings.QUIET
 
         self.log = logfunctions.log
@@ -98,22 +97,23 @@ class Crawler( object ):
 
             self.log('Registered API ' + name, do_print=(not self.quiet))
 
-    def set_db_session(self, client, db_name):
+    def add_db(self, db):
         """
             register db session, open/create database
-            @param client: session object
-            @param db_name: database name
+            @param db: database object
         """
-        self.log("Connected to database " + db_name)
-        self.db_session = client
-        self.db = client.create_database(db_name, throw_on_exists=False)
+        if db.name in self.dbs:
+            self.error('DB with name "{}" already exists!'.format(db.name))
+            sys.exit(1)
+        else:
+            self.dbs[db.name] = db
 
-    def close_db_session(self):
+    def shutdown(self):
         """
-            disconnect from database
+            disconnect from databases
         """
-        if self.db_session:
-            self.db_session.disconnect()
+        for db in self.dbs.itervalues():
+            db.close_session()
 
     def crawl( self, api, timestamp, station ):
         """
@@ -190,5 +190,5 @@ class Crawler( object ):
                 self.apis[n]['monitoring']['time_consumption'].append(time_needed)
 
                 converted_results = self.apis[n]['handle'](self.apis[n]['queue'])
-                for c in converted_results:
-                    self.db.create_document(c)
+                for db in self.dbs.itervalues():
+                    db.write_to_db(converted_results)

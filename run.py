@@ -27,8 +27,8 @@ def main():
         crawler.add_api( api.name, api.baseurl, get_params_function=api.get_params, function_to_call=api.function_to_call)
 
     #import the db to use
-    from crawler.crawlerhelpers import cloudant_db
-    crawler.set_db_session(cloudant_db.get_db_session('vcap-local.json'), settings.DB_NAME)
+    from crawler.crawlerhelpers.cloudant_db import CloudantDB
+    crawler.add_db(CloudantDB('vcap-local.json', settings.DB_NAME))
 
     # run apis with the following station ids
     runner = threading.Thread(target=crawler.run, args=(settings.STATION_IDS, ))
@@ -42,7 +42,7 @@ def shutdown():
 
     if runner:
         runner.join()
-    crawler.close_db_session()
+    crawler.shutdown()
 
 if __name__ == '__main__':
     main()
