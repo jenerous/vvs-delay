@@ -31,8 +31,7 @@ def main():
     crawler.set_db_session(cloudant_db.get_db_session('vcap-local.json'), settings.DB_NAME)
 
     # run apis with the following station ids
-    station_ids = ['6008']
-    runner = threading.Thread(target=crawler.run, args=(station_ids, ))
+    runner = threading.Thread(target=crawler.run, args=(settings.STATION_IDS, ))
     runner.start()
     crawler.log('Crawler is running', log=True)
 

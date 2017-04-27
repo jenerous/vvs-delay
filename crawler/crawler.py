@@ -11,7 +11,10 @@ import threading
 from   time        import sleep
 from   time        import time
 from   time        import gmtime
-from   time        import strftime
+
+from logging       import logfunctions
+
+import settings    as settings
 
 import numpy as np
 
@@ -27,49 +30,11 @@ class Crawler( object ):
         self.intervals = {}
         self.db_session = None
         self.db = None
-        self.quiet = False
+        self.quiet = settings.QUIET
 
-    def log( self, msg, level='INFO', log=False, force_print=False ):
-        """
-            log function, use this instead of direct prints.
-            One can also use predefined functions for info, warning and error
-            @param msg: the text message that shall be printed
-            @param level: prefix for the log message
-            @param log: write this to a file or not
-            @param force_print: if self.quiet is true, print this to stdout anyways
-        """
-        current_time_raw = gmtime()
-        current_time     = strftime('%Y-%m-%d %H:%M:%S', current_time_raw)
-        log_msg = '{} [{}]: {}'.format(level, current_time, msg)
-        if not self.quiet or force_print:
-            print log_msg
-        if log:
-            log_file_name = 'crawler_log_{}.log'.format(strftime('%Y-%m-%d', current_time_raw))
-            with open(log_file_name, 'a') as log_file:
-                log_file.write(log_msg + '\n')
-
-    def info( self, msg ):
-        """
-            calls log with defaults
-            @param msg: the text message that shall be printed
-        """
-        self.log(msg)
-
-    def warning( self, msg ):
-        """
-            calls log with WARNING as prefix and log to file activated
-            @param msg: the text message that shall be printed
-        """
-        self.log( msg, level='WARNING', log=True )
-
-    def error( self, msg ):
-        """
-            Calls log with ERROR as prefix, log to file activated and print to user.
-            Terminates the program!
-            @param msg: the text message that shall be printed
-        """
-        self.log( msg, level='ERROR', log=True, force_print=True )
-        sys.exit(1)
+        self.log = logfunctions.log
+        self.warning = logfunctions.warning
+        self.error = logfunctions.error
 
     def raw_return( self, result ):
         """
@@ -106,6 +71,7 @@ class Crawler( object ):
 
         if name in self.apis:
             self.error('API with key "{}" already exists!'.format(name))
+            sys.exit(1)
         else:
             # register api
             self.apis[name] = {
@@ -130,7 +96,7 @@ class Crawler( object ):
 
             self.intervals[interval].append(name)
 
-            self.log('Registered API ' + name)
+            self.log('Registered API ' + name, do_print=(not self.quiet))
 
     def set_db_session(self, client, db_name):
         """
@@ -156,7 +122,7 @@ class Crawler( object ):
             @param timestamp: current time as it comes from time.time
             @param station: id of the station
         """
-        self.info(api['name'] + ' was called')
+        self.log(api['name'] + ' was called')
         crawl_params = self.build_get_params(api['get_params'](timestamp, station))
         crawl_results = self.api_call(api['url'] + '?' + crawl_params)
         api['queue'].put({
@@ -175,7 +141,7 @@ class Crawler( object ):
         try:
             return json.loads(urllib2.urlopen(url).read())
         except urllib2.URLError:
-            self.warning('API call failed!\n>' + url)
+            self.warning('API call failed!\n>' + url, do_print=(not self.quiet))
             return None
 
     def run( self, SIDs ):
@@ -220,7 +186,7 @@ class Crawler( object ):
                 if self.apis[n]['monitoring']['time_consumption']:
                     time_needed_normally = np.percentile(self.apis[n]['monitoring']['time_consumption'], 80)
                     if time_needed > time_needed_normally:
-                        self.warning('{} needed {}. A normal value would be around {}'.format(n, time_needed, time_needed_normally))
+                        self.warning('{} needed {}. A normal value would be around {}'.format(n, time_needed, time_needed_normally), do_print=(not self.quiet))
                 self.apis[n]['monitoring']['time_consumption'].append(time_needed)
 
                 converted_results = self.apis[n]['handle'](self.apis[n]['queue'])
