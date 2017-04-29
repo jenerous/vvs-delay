@@ -191,6 +191,6 @@ class Crawler( object ):
 
                 converted_results = self.apis[n]['handle'](self.apis[n]['queue'])
 
-                if converted_results not is None:
+                if converted_results is not None:
                     for db in self.dbs.itervalues():
                         db.write_to_db(converted_results)
