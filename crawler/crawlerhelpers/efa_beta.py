@@ -6,11 +6,11 @@ def get_instance():
 
 
 class API_efaBeta(object):
-    def __init__( self ):
+    def __init__(self):
         self.name = 'efaBeta'
         self.baseurl = 'https://www3.vvs.de/mngvvs/XML_DM_REQUEST'
 
-    def convert_station_id( self, station_id ):
+    def convert_station_id(self, station_id):
         """
             convert station id that is given to the api specific
             representation if necessary
@@ -19,7 +19,7 @@ class API_efaBeta(object):
         """
         return station_id
 
-    def get_params( self, current_time_raw, station ):
+    def get_params(self, current_time_raw, station):
         """
             @param current_time_raw: time as gmtime object
             @param station: station id in general representation
@@ -29,22 +29,22 @@ class API_efaBeta(object):
         itdTime = strftime("%H%M", current_time_raw)
 
         return {
-                'SpEncId' : 0,
-                'coordOutputFormat' : "EPSG:4326",
-                'deleteAssignedStops' : 1,
-                'itdDate' : itdDate,
-                'itdTime' : itdTime,
-                'limit' : 50,
-                'mode' : "direct",
-                'name_dm' : "de:8111:{}".format(self.convert_station_id(station)),
-                'outputFormat' : "rapidJSON",
-                'serverInfo' : "1",
-                'type_dm' : "any",
-                'useRealtime' : "1",
-                'version' : "10.2.2.48"
+                'SpEncId': 0,
+                'coordOutputFormat': "EPSG:4326",
+                'deleteAssignedStops': 1,
+                'itdDate': itdDate,
+                'itdTime': itdTime,
+                'limit': 50,
+                'mode': "direct",
+                'name_dm': "de:8111:{}".format(self.convert_station_id(station)),
+                'outputFormat': "rapidJSON",
+                'serverInfo': "1",
+                'type_dm': "any",
+                'useRealtime': "1",
+                'version': "10.2.2.48"
             }
 
-    def function_to_call( self, results ):
+    def function_to_call(self, results):
         """
             function that gets called on an api response
             @param results: queue object of the api that contains result dicts from
@@ -63,26 +63,24 @@ class API_efaBeta(object):
             station = {}
             current_dict = {}
             station[r['station']] = [current_dict]
-            current_dict['timestamp'] = strftime('%Y-%m-%dT%H:%M:%SZ', r['timestamp'])  # "2017-04-14 TEST"
+            current_dict['timestamp'] = strftime('%Y-%m-%dT%H:%M:%SZ', r['timestamp'])
             current_dict['lines'] = {}
 
-            if not 'results' in r or not 'stopEvents' in r['results']:
+            if 'results' not in r or 'stopEvents' not in r['results']:
                 continue
 
             product_types = ['S-Bahn']
+            # only use S-Bahn and realtime controlled
             stop_events = filter(lambda elem:
-                                elem['transportation']['product']['name'] in product_types,
-                                r['results']['stopEvents'])
+                                 elem['transportation']['product']['name'] in product_types
+                                 and 'isRealtimeControlled' in elem,
+                                 r['results']['stopEvents'])
 
             for st_event in stop_events:
                 departure_dict = {}
                 # print st_event
-                if 'isRealtimeControlled' in st_event:
-                    departure_dict['isRealtimeControlled'] = st_event['isRealtimeControlled']
-                else:
-                    departure_dict['isRealtimeControlled'] = False
 
-                if 'isRealtimeControlled' in departure_dict and 'departureTimeEstimated' in st_event:
+                if 'departureTimeEstimated' in st_event:
                     departure_dict['departureTimeEstimated'] = st_event['departureTimeEstimated']
                 # else:
                 #     departure_dict['departureTimeEstimated'] = None
