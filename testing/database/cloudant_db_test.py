@@ -1,11 +1,12 @@
 from crawler.crawlerhelpers import cloudant_db
+from config import settings
 
 def test():
     failed = False
     db = None
 
     try:
-        db = cloudant_db.CloudantDB('../../vcap-local.json', 'test')
+        db = cloudant_db.CloudantDB(settings.CLOUDANT_CRED_FILE, 'test')
         print "Creating DB instance \t - check"
     except:
         failed = True

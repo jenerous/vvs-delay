@@ -1,11 +1,13 @@
 #!/usr/bin/python
 
 import atexit
-import cf_deployment_tracker
-import threading
-from crawler import Crawler
-import crawler.settings as settings
 import importlib
+import threading
+
+import cf_deployment_tracker
+
+import config.settings as settings
+from crawler import Crawler
 
 # Emit Bluemix deployment event
 cf_deployment_tracker.track()
@@ -28,10 +30,10 @@ def main():
 
     #import the db to use
     from crawler.crawlerhelpers.cloudant_db import CloudantDB
-    crawler.add_db(CloudantDB('vcap-local.json', settings.DB_NAME))
+    crawler.add_db(CloudantDB(settings.CLOUDANT_CRED_FILE, settings.DB_NAME))
 
     # run apis with the following station ids
-    runner = threading.Thread(target=crawler.run, args=(settings.STATION_IDS, ))
+    runner = threading.Thread(target=crawler.run, args=(settings.STATION_IDS,))
     runner.start()
     crawler.log('Crawler is running', log=True)
 

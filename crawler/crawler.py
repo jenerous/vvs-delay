@@ -1,22 +1,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
-import sys
-import json
 import Queue
-import urllib2
+import json
+import sys
 import threading
-
-from   time        import sleep
-from   time        import time
-from   time        import gmtime
-
-from logging       import logfunctions
-
-import settings    as settings
+import urllib2
+from   time import gmtime
+from   time import sleep
+from   time import time
 
 import numpy as np
+
+import crawlerhelpers.monitoring as monitoring
+from config import settings as settings
+from logging import logfunctions
 
 ONE_MINUTE_IN_SECONDS = 60
 
@@ -79,12 +77,6 @@ class Crawler( object ):
                 'handle': function_to_call,
                 'interval': interval,
                 'get_params': get_params_function,
-                'monitoring': {
-                    'called': 0,
-                    'time_consumption': [],
-                    'errors': 0,
-                    'started_last': None
-                },
                 'queue': Queue.Queue(),
                 'threads': None
             }
@@ -153,6 +145,10 @@ class Crawler( object ):
         unique_intervals = np.array(self.intervals.keys(), dtype=np.int)
         unique_intervals = unique_intervals.reshape((1, unique_intervals.shape[0]))
         intervals = np.repeat(unique_intervals, 2, axis=0)
+
+        for api in self.apis:
+            monitoring.register_monitor_for_api(api)
+
         while True:
             tick = intervals[0].min()
             self.log('sleeping for {} minute{} now\n'.format(tick, 's' if tick > 1 else ''), log=True)
@@ -165,31 +161,26 @@ class Crawler( object ):
 
             for i, e in enumerate(intervals[0]):
                 if e == 0:
-                    for n in self.intervals[intervals[1, i]]:
-                        call_apis.append(n)
+                    for name in self.intervals[intervals[1, i]]:
+                        call_apis.append(name)
                     intervals[0, i] = intervals[1, i]
 
-            for n in call_apis:
+            for name in call_apis:
                 timestamp = time()
-                self.apis[n]['monitoring']['started_last'] = timestamp
-                self.apis[n]['monitoring']['called'] += 1
-                self.apis[n]['threads'] = [threading.Thread(target=self.crawl, args=(self.apis[n], gmtime(timestamp), SID, )) for SID in SIDs]
-                for t in self.apis[n]['threads']:
+                monitoring.call_start(name, timestamp)
+                self.apis[name]['threads'] = \
+                    [threading.Thread(target=self.crawl, args=(self.apis[name], gmtime(timestamp), SID, )) for SID in SIDs]
+                for t in self.apis[name]['threads']:
                     t.start()
 
-            for n in call_apis:
-                for t in self.apis[n]['threads']:
+            for name in call_apis:
+                for t in self.apis[name]['threads']:
                     t.join()
 
                 # monitoring
-                time_needed = time() - self.apis[n]['monitoring']['started_last']
-                if self.apis[n]['monitoring']['time_consumption']:
-                    time_needed_normally = np.percentile(self.apis[n]['monitoring']['time_consumption'], 80)
-                    if time_needed > time_needed_normally:
-                        self.warning('{} needed {}s. A normal value would be around {}s'.format(n, time_needed, time_needed_normally), do_print=(not self.quiet))
-                self.apis[n]['monitoring']['time_consumption'].append(time_needed)
+                monitoring.call_end(name, time())
 
-                converted_results = self.apis[n]['handle'](self.apis[n]['queue'])
+                converted_results = self.apis[name]['handle'](self.apis[name]['queue'])
 
                 if converted_results is not None:
                     for db in self.dbs.itervalues():

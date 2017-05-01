@@ -1,5 +1,5 @@
 # credential file
-vcap-local.json
+config/vcap-local.json
 
 # Logs
 logs

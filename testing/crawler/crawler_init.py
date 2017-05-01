@@ -1,9 +1,6 @@
-from crawler.crawlerhelpers import test_api
 import threading
 from crawler.crawler import Crawler
-from time import sleep
 from time import gmtime
-import re
 from time import strftime
 from time import strptime
 import os
@@ -25,10 +22,10 @@ def test():
         from crawler.crawlerhelpers.test_api import API_test
         api_test = API_test()
         mycrawler.add_api( api_test.name, api_test.baseurl, get_params_function=api_test.get_params, function_to_call=api_test.function_to_call)
-        print "add api \t\t - check"
+        print "add api \t\t\t - check"
     except Exception as e:
         failed = True
-        print "add api \t\t - failed"
+        print "add api \t\t\t - failed"
         print e
 
     try:
