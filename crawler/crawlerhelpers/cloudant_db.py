@@ -25,6 +25,7 @@ def get_client_session(cred_file):
     password = creds['password']
     return Cloudant(user, password, url=url, connect=True)
 
+
 class CloudantDB(object):
 
     def __init__(self, cred_file, db_name):

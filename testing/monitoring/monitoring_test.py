@@ -2,6 +2,7 @@ from crawler.crawlerhelpers import monitoring as m
 
 API_NAME = 'monitoring_test_api'
 
+
 def test():
     failed = False
     monitor = None
@@ -13,7 +14,7 @@ def test():
             print "Get monitor for Api \t - check"
         else:
             raise
-    except:
+    except Exception:
         failed = True
         print "Get monitor for Api \t - fail"
 
@@ -27,7 +28,7 @@ def test():
             print "Safe monitor \t\t\t - check"
         else:
             raise
-    except:
+    except Exception:
         failed = True
         print "Safe monitor \t\t\t - fail"
 
@@ -50,7 +51,6 @@ def test():
     except Exception as e:
         failed = True
         print "Duration monitoring \t - fail"
-
 
     return failed
 

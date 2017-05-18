@@ -1,6 +1,7 @@
 from crawler.crawlerhelpers import cloudant_db
 from config import settings
 
+
 def test():
     failed = False
     db = None
@@ -8,11 +9,11 @@ def test():
     try:
         db = cloudant_db.CloudantDB(settings.CLOUDANT_CRED_FILE, 'test')
         print "Creating DB instance \t - check"
-    except:
+    except Exception:
         failed = True
         print "Creating DB instance \t - fail"
 
-    #purge old data
+    # purge old data
     doc1 = db.db['item1']
     doc2 = db.db['item2']
     if doc1.exists():
@@ -42,7 +43,7 @@ def test():
             print "Writing to DB \t\t - check"
         else:
             print "Writing to DB \t\t - fail"
-    except:
+    except Exception:
         failed = True
         print "Writing to DB \t\t - fail (Exception!)"
 

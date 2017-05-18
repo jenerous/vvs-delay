@@ -1,4 +1,5 @@
 from time import strftime
+from time import gmtime
 
 
 def get_instance():
@@ -21,13 +22,12 @@ class API_efaBeta(object):
 
     def get_params(self, current_time_raw, station):
         """
-            @param current_time_raw: time as gmtime object
+            @param current_time_raw: seconds from time.time
             @param station: station id in general representation
             @return dict with key value pairs for api parameters
         """
-        itdDate = strftime("%Y%m%d", current_time_raw)
-        itdTime = strftime("%H%M", current_time_raw)
-
+        itdDate = strftime("%Y%m%d", gmtime(current_time_raw / 1000.0))
+        itdTime = strftime("%H%M", gmtime(current_time_raw / 1000.0))
         return {
                 'SpEncId': 0,
                 'coordOutputFormat': "EPSG:4326",
@@ -60,11 +60,9 @@ class API_efaBeta(object):
         converted_results = []
 
         for r in iter(results.get, None):
-            station = {}
-            current_dict = {}
-            station[r['station']] = [current_dict]
-            current_dict['timestamp'] = strftime('%Y-%m-%dT%H:%M:%SZ', r['timestamp'])
-            current_dict['lines'] = {}
+            current_dict = {
+                'lines': {}
+            }
 
             if 'results' not in r or 'stopEvents' not in r['results']:
                 continue
@@ -107,10 +105,7 @@ class API_efaBeta(object):
                 else:
                     current_dict['lines'][line] = [departure_dict]
 
-            converted_results.append(station)
+            r['results'] = current_dict
+            converted_results.append(r)
 
-        # print "Results: "
-        # with open("results.json", 'w') as output:
-        #     json.dump(converted_results, output, indent=4)
-        # pprint(converted_results)
         return converted_results

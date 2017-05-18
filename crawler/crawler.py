@@ -6,9 +6,8 @@ import json
 import sys
 import threading
 import urllib2
-from   time import gmtime
-from   time import sleep
-from   time import time
+from time import sleep
+from time import time
 
 import numpy as np
 
@@ -18,12 +17,13 @@ from logging import logfunctions
 
 ONE_MINUTE_IN_SECONDS = 60
 
-class Crawler( object ):
+
+class Crawler(object):
     """
         crawler instance.
         You can plug in different apis which are called by a certain interval
     """
-    def __init__( self ):
+    def __init__(self):
         self.apis = {}
         self.intervals = {}
         self.dbs = {}
@@ -33,7 +33,7 @@ class Crawler( object ):
         self.warning = logfunctions.warning
         self.error = logfunctions.error
 
-    def raw_return( self, result ):
+    def raw_return(self, result):
         """
             a very basic function to handle api results. Just return what came
             back from server
@@ -41,7 +41,7 @@ class Crawler( object ):
         """
         return result
 
-    def build_get_params( self, data_dict ):
+    def build_get_params(self, data_dict):
         '''
             function that builds a string with given dict for HTTP get calls
             @params dict that contains key value pairs which chall be concatenated
@@ -49,11 +49,13 @@ class Crawler( object ):
         '''
         if len(data_dict.keys()) > 0:
             options = [''] + [(k, data_dict[k]) for k in data_dict]
-            return reduce(lambda p1, p2: str(p1) + str(p2[0]) + '=' + str(p2[1]) + '&', options)[:-1]
+            return reduce(lambda p1, p2: str(p1) + str(p2[0]) + '=' +
+                          str(p2[1]) + '&', options)[:-1]
         else:
             return ''
 
-    def add_api( self, name, url, function_to_call=raw_return, get_params_function={}, interval=5 ):
+    def add_api(self, name, url, function_to_call=raw_return,
+                get_params_function={}, interval=5):
         """
             add an api to the crawler
             @param name: how shall the api be called. This is like an id!
@@ -107,7 +109,7 @@ class Crawler( object ):
         for db in self.dbs.itervalues():
             db.close_session()
 
-    def crawl( self, api, timestamp, station ):
+    def crawl(self, api, timestamp, station):
         """
             async called api call. Adds results to queue of api
             @param api: api object
@@ -116,7 +118,9 @@ class Crawler( object ):
         """
         self.log(api['name'] + ' was called')
         crawl_params = self.build_get_params(api['get_params'](timestamp, station))
+        print api['url'] + '?' + crawl_params
         crawl_results = self.api_call(api['url'] + '?' + crawl_params)
+
         api['queue'].put({
             'timestamp': timestamp,
             'name': api['name'],
@@ -124,7 +128,7 @@ class Crawler( object ):
             'results': crawl_results
         })
 
-    def api_call( self, url ):
+    def api_call(self, url):
         '''
             wrap api calls and return json directly. Rises urllib2.URLError on fail
             @params url url to calls
@@ -136,7 +140,7 @@ class Crawler( object ):
             self.warning('API call failed!\n>' + url, do_print=(not self.quiet))
             return None
 
-    def run( self, SIDs ):
+    def run(self, SIDs):
         """
             start the call loop
             @param SIDs: station ids as list
@@ -151,7 +155,8 @@ class Crawler( object ):
 
         while True:
             tick = intervals[0].min()
-            self.log('sleeping for {} minute{} now\n'.format(tick, 's' if tick > 1 else ''), log=True)
+            self.log('sleeping for {} minute{} now\n'.format(tick, 's' if tick > 1 else ''),
+                     log=True)
             sys.stdout.flush()
 
             sleep(tick * ONE_MINUTE_IN_SECONDS)
@@ -166,10 +171,11 @@ class Crawler( object ):
                     intervals[0, i] = intervals[1, i]
 
             for name in call_apis:
-                timestamp = time()
+                timestamp = int(time() * 1000)
                 monitoring.call_start(name, timestamp)
                 self.apis[name]['threads'] = \
-                    [threading.Thread(target=self.crawl, args=(self.apis[name], gmtime(timestamp), SID, )) for SID in SIDs]
+                    [threading.Thread(target=self.crawl, args=(self.apis[name], timestamp, SID, ))
+                     for SID in SIDs]
                 for t in self.apis[name]['threads']:
                     t.start()
 
@@ -178,10 +184,15 @@ class Crawler( object ):
                     t.join()
 
                 # monitoring
-                monitoring.call_end(name, time())
+                monitoring.call_end(name)
 
                 converted_results = self.apis[name]['handle'](self.apis[name]['queue'])
 
+                print converted_results
+
                 if converted_results is not None:
-                    for db in self.dbs.itervalues():
-                        db.write_to_db(converted_results)
+                    for st in converted_results:
+                        print
+                        print '=' * 80
+                        print st
+                        # self.dbs[settings.DB_NAME].write_to_db(st)

@@ -1,13 +1,14 @@
 def get_instance():
     return API_test()
 
+
 class API_test(object):
     """testing API class"""
-    def __init__( self ):
+    def __init__(self):
         self.name = 'TEST'
         self.baseurl = 'https://127.0.0.1'
 
-    def convert_station_id( self, station_id ):
+    def convert_station_id(self, station_id):
         """
             convert station id that is given to the api specific
             representation if necessary
@@ -16,19 +17,19 @@ class API_test(object):
         """
         return station_id
 
-    def get_name( self ):
+    def get_name(self):
         """
             return default name for api
         """
         return ''
 
-    def get_base_url( self ):
+    def get_base_url(self):
         """
             return default basic url for api
         """
         return ''
 
-    def get_params( self, current_time_raw, station ):
+    def get_params(self, current_time_raw, station):
         """
             @param current_time_raw: time as gmtime object
             @param station: station id in general representation
@@ -38,7 +39,7 @@ class API_test(object):
             'test': 'test'
         }
 
-    def function_to_call( self, results ):
+    def function_to_call(self, results):
         """
             function that gets called on an api response
             @param results: queue object of the api that contains result dicts from

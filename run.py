@@ -13,7 +13,8 @@ from crawler import Crawler
 cf_deployment_tracker.track()
 
 crawler = None
-runner  = None
+runner = None
+
 
 def main():
     global crawler, runner
@@ -23,12 +24,13 @@ def main():
 
     # import the apis to use
     for a in settings.APIS:
-        api_module = importlib.import_module("crawler.crawlerhelpers." + a  )
+        api_module = importlib.import_module("crawler.crawlerhelpers." + a)
         api = api_module.get_instance()
         # register api
-        crawler.add_api( api.name, api.baseurl, get_params_function=api.get_params, function_to_call=api.function_to_call)
+        crawler.add_api(api.name, api.baseurl, get_params_function=api.get_params,
+                        function_to_call=api.function_to_call, interval=5)
 
-    #import the db to use
+    # import the db to use
     from crawler.crawlerhelpers.cloudant_db import CloudantDB
     crawler.add_db(CloudantDB(settings.CLOUDANT_CRED_FILE, settings.DB_NAME))
 
@@ -45,6 +47,7 @@ def shutdown():
     if runner:
         runner.join()
     crawler.shutdown()
+
 
 if __name__ == '__main__':
     main()
