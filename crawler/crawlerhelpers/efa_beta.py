@@ -10,6 +10,7 @@ class API_efaBeta(object):
     def __init__(self):
         self.name = 'efaBeta'
         self.baseurl = 'https://www3.vvs.de/mngvvs/XML_DM_REQUEST'
+        self.version = '1.2'
 
     def convert_station_id(self, station_id):
         """
@@ -60,6 +61,8 @@ class API_efaBeta(object):
         converted_results = []
 
         for r in iter(results.get, None):
+            r['version'] = self.version
+
             current_dict = {
                 'lines': {}
             }
