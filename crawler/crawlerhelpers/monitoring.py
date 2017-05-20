@@ -3,7 +3,7 @@ import cloudant_db
 from crawler.logging import logfunctions
 from numpy import percentile
 from time import time
-
+from time import sleep
 client = cloudant_db.get_client_session(settings.CLOUDANT_CRED_FILE)
 db = client.create_database(settings.MONITORING_DB_NAME, throw_on_exists=False)
 
@@ -16,7 +16,7 @@ def register_monitor_for_api(api_name):
 
 def call_start(api_name, timestamp=None):
     if timestamp is None:
-        timestamp = int(time() * 1000)
+        timestamp = time() * 1000
 
     if api_name not in monitors:
         register_monitor_for_api(api_name)
@@ -28,7 +28,7 @@ def call_start(api_name, timestamp=None):
 
 def call_end(api_name, timestamp=None):
     if timestamp is None:
-        timestamp = int(time() * 1000)
+        timestamp = time() * 1000
 
     delayed = False
 
@@ -62,6 +62,8 @@ def get_monitor_for_api(api_name):
 
 def save(monitor):
     if monitor.exists():
+        # doing this to avoid htting the maximum requests per second limit
+        sleep(0.2)
         monitor.save()
     else:
         db.create_document(monitor)

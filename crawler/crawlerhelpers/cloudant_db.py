@@ -2,6 +2,7 @@ from cloudant import Cloudant
 import json
 import os
 from crawler.logging import logfunctions
+from time import sleep
 
 
 def get_client_session(cred_file):
@@ -32,6 +33,7 @@ class CloudantDB(object):
         self.name = db_name
         self.client = get_client_session(cred_file)
         self.db = self.client.create_database(db_name, throw_on_exists=False)
+        self.max_req_per_sec = 10
         logfunctions.log("Connected to database '{}'".format(db_name))
 
     def close_session(self):
@@ -41,5 +43,16 @@ class CloudantDB(object):
 
     def write_to_db(self, results):
         logfunctions.log("Writing to database '{}'".format(self.name))
-        for r in results:
-            self.db.create_document(r)
+        if isinstance(results, list):
+            if len(results) >= self.max_req_per_sec:
+                for r in range(self.max_req_per_sec, len(results), self.max_req_per_sec):
+                    for idx in range(r - self.max_req_per_sec, r):
+                        self.db.create_document(results[r])
+                    logfunctions.log('delaying requests, because maximum requests per second '
+                                     'limit could be reached')
+                    sleep(1.5)
+            else:
+                for r in range(len(results)):
+                    self.db.create_document(results[r])
+        else:
+            self.db.create_document(results)

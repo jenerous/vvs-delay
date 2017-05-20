@@ -3,6 +3,7 @@
 
 import Queue
 import json
+import os
 import sys
 import threading
 import urllib2
@@ -11,6 +12,7 @@ from time import time
 
 import numpy as np
 
+from crawlerhelpers.meta_efa import API_meta_efa as stations_api
 import crawlerhelpers.monitoring as monitoring
 from config import settings as settings
 from logging import logfunctions
@@ -32,6 +34,13 @@ class Crawler(object):
         self.log = logfunctions.log
         self.warning = logfunctions.warning
         self.error = logfunctions.error
+
+        if os.path.isfile(settings.STATIONS_FN):
+            self.log('Found station ids file. ' +
+                     'Remove to trigger an update ({})'.format(settings.STATIONS_FN))
+        else:
+            self.log('Updating station ids')
+            self.update_station_ids()
 
     def raw_return(self, result):
         """
@@ -118,7 +127,6 @@ class Crawler(object):
         """
         self.log(api['name'] + ' was called')
         crawl_params = self.build_get_params(api['get_params'](timestamp, station))
-        print api['url'] + '?' + crawl_params
         crawl_results = self.api_call(api['url'] + '?' + crawl_params)
 
         api['queue'].put({
@@ -137,8 +145,91 @@ class Crawler(object):
         try:
             return json.loads(urllib2.urlopen(url).read())
         except urllib2.URLError:
-            self.warning('API call failed!\n>' + url, do_print=(not self.quiet))
+            self.warning('API call failed!\n>' + url)
             return None
+
+    def update_station_ids_single(self, queue, missing, url, station_id):
+        """
+            async handled api call. Adds results to queue
+            @param queue: queue object
+            @param url: url to call
+            @param station_id: station's id
+        """
+        # call meta_efa api to get detailed information of stations departures
+        # This contains numbers of transportation system and delays as well
+        departures = self.api_call(url)
+        if departures is None:
+            missing.put(station_id)
+        else:
+            # find out if an S-Bahn stops here
+            s_lines = filter(lambda x: x['number'].startswith('S'), departures)
+            if len(s_lines) > 0:
+                queue.put(station_id)
+
+    def update_station_ids(self):
+        """
+            Update the station ids through meta efa api.
+            Calls update_station_ids_single asynchronously
+        """
+        self.log('updating stations')
+        _stations_api = stations_api()
+        stations_url = _stations_api.baseurl
+        settings.STATION_IDS = []
+        missing_stations = []
+
+        # get stations from meta_efa api. This is a list of JSON objects.
+        # The objects contain stationId and name of the station
+        api_result = self.api_call(stations_url)
+
+        # s_queue = Queue.Queue()
+        # missing = Queue.Queue()
+        #
+        # only use the staion ids
+        all_station_ids = map(lambda x: x['stationId'], api_result)
+        urls = [os.path.join(stations_url, sid, 'departures') for sid in all_station_ids]
+
+        # concurrent = 10
+        # for part in range(concurrent, len(all_station_ids), concurrent):
+        #     part_station_ids = all_station_ids[part - concurrent:part]
+        #     print 'crawling:', part_station_ids
+        #     threads = [threading.Thread(target=self.update_station_ids_single,
+        #                                 args=(s_queue, missing, url, station_id,))
+        #                for url, station_id in zip(urls, part_station_ids)]
+        #
+        #     for t in threads:
+        #         t.start()
+        #
+        #     for t in threads:
+        #         t.join()
+        #     sleep(5)
+        #
+        # s_queue.put(None)
+        # missing.put(None)
+        #
+        # for station in iter(s_queue.get, None):
+        #     settings.STATION_IDS.append(station)
+        # for station in iter(missing.get, None):
+        #     missing_stations.append(station)
+
+        for num, url, station_id in zip(range(len(urls)), urls, all_station_ids):
+            print '\r{}'.format(num),
+            sys.stdout.flush()
+            # update_station_ids_single()
+            departures = self.api_call(url)
+            if departures is None:
+                missing_stations.append(str(station_id))
+            else:
+                # find out if an S-Bahn stops here
+                s_lines = filter(lambda x: x['number'].startswith('S'), departures)
+                if len(s_lines) > 0:
+                    settings.STATION_IDS.append(str(station_id))
+
+        self.info("Found stations: " + ', '.join(settings.STATION_IDS))
+        self.info("Failed api call: " + ', '.join(missing_stations))
+        stations_dict = {
+            'stations': settings.STATIONS_FN
+        }
+        json.dump(open(stations_dict, 'w'), settings.STATION_IDS)
 
     def run(self, SIDs):
         """
@@ -171,7 +262,7 @@ class Crawler(object):
                     intervals[0, i] = intervals[1, i]
 
             for name in call_apis:
-                timestamp = int(time() * 1000)
+                timestamp = time() * 1000
                 monitoring.call_start(name, timestamp)
                 self.apis[name]['threads'] = \
                     [threading.Thread(target=self.crawl, args=(self.apis[name], timestamp, SID, ))
@@ -188,11 +279,5 @@ class Crawler(object):
 
                 converted_results = self.apis[name]['handle'](self.apis[name]['queue'])
 
-                print converted_results
-
                 if converted_results is not None:
-                    for st in converted_results:
-                        print
-                        print '=' * 80
-                        print st
-                        # self.dbs[settings.DB_NAME].write_to_db(st)
+                    self.dbs[settings.DB_NAME].write_to_db(converted_results)

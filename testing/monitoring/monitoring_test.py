@@ -25,12 +25,12 @@ def test():
         m.save(monitor)
         after = m.get_monitor_for_api(API_NAME)
         if after['called'] == called_before + 1:
-            print "Safe monitor \t\t\t - check"
+            print "Safe monitor \t\t - check"
         else:
             raise
     except Exception:
         failed = True
-        print "Safe monitor \t\t\t - fail"
+        print "Safe monitor \t\t - fail"
 
     # test call duration monitoring
     try:
@@ -49,6 +49,7 @@ def test():
             raise
         print "Duration monitoring \t - check"
     except Exception as e:
+        print e
         failed = True
         print "Duration monitoring \t - fail"
 

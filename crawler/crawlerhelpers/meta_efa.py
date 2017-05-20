@@ -3,14 +3,14 @@ from time import gmtime
 
 
 def get_instance():
-    return API_efaBeta()
+    return API_meta_efa()
 
 
-class API_efaBeta(object):
+class API_meta_efa(object):
     def __init__(self):
-        self.name = 'efaBeta'
-        self.baseurl = 'https://www3.vvs.de/mngvvs/XML_DM_REQUEST'
-        self.version = '1.2'
+        self.name = 'meta_efa'
+        self.baseurl = 'https://efa-api.asw.io/api/v1/station'
+        self.version = '0.1'
 
     def convert_station_id(self, station_id):
         """
@@ -19,7 +19,7 @@ class API_efaBeta(object):
             @param station_id: id in general representation
             @return id in api specific representation
         """
-        return station_id[3:]
+        return station_id
 
     def get_params(self, current_time_raw, station):
         """
@@ -79,6 +79,7 @@ class API_efaBeta(object):
 
             for st_event in stop_events:
                 departure_dict = {}
+                # print st_event
 
                 if 'departureTimeEstimated' in st_event:
                     departure_dict['departureTimeEstimated'] = st_event['departureTimeEstimated']
