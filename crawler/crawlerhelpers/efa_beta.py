@@ -10,7 +10,7 @@ class API_efaBeta(object):
     def __init__(self):
         self.name = 'efaBeta'
         self.baseurl = 'https://www3.vvs.de/mngvvs/XML_DM_REQUEST'
-        self.version = '1.2'
+        self.version = '1.3'
 
     def convert_station_id(self, station_id):
         """
@@ -101,6 +101,8 @@ class API_efaBeta(object):
                 line = st_event['transportation']['number']
                 departure_dict['name'] = st_event['transportation']['product']['name']
                 departure_dict['class'] = st_event['transportation']['product']['class']
+                departure_dict['class'] = st_event['transportation']['product']['class']
+                departure_dict['id'] = st_event['transportation']['product']['id']
 
                 if line in current_dict['lines']:
                     current_dict['lines'][line].append(departure_dict)
