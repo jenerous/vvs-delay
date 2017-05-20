@@ -102,7 +102,7 @@ class API_efaBeta(object):
                 departure_dict['name'] = st_event['transportation']['product']['name']
                 departure_dict['class'] = st_event['transportation']['product']['class']
                 departure_dict['class'] = st_event['transportation']['product']['class']
-                departure_dict['id'] = st_event['transportation']['product']['id']
+                departure_dict['id'] = st_event['transportation']['id']
 
                 if line in current_dict['lines']:
                     current_dict['lines'][line].append(departure_dict)
