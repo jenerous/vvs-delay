@@ -17,7 +17,7 @@ for i, t in enumerate(tests):
 
         current_task = 'importing {}'.format(t)
         print '{}\n{}'.format('-' * 80, current_task)
-        t_path = t.replace('/','.')[:-3]
+        t_path = t.replace('/', '.')[:-3]
         current_test = importlib.import_module(t_path)
         print '## passed'
         current_task = 'running tests'

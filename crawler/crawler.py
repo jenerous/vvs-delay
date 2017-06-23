@@ -245,7 +245,7 @@ class Crawler(object):
             monitoring.register_monitor_for_api(api)
 
         while True:
-            tick = intervals[0].min()
+            tick = max(0, intervals[0].min())
             self.log('sleeping for {} minute{} now\n'.format(tick, 's' if tick > 1 else ''),
                      log=True)
             sys.stdout.flush()
@@ -280,4 +280,5 @@ class Crawler(object):
                 converted_results = self.apis[name]['handle'](self.apis[name]['queue'])
 
                 if converted_results is not None:
-                    self.dbs[settings.DB_NAME].write_to_db(converted_results)
+                    time_needed_for_db = self.dbs[settings.DB_NAME].write_to_db(converted_results)
+                    intervals[0] = intervals[0] - time_needed_for_db
