@@ -281,4 +281,4 @@ class Crawler(object):
 
                 if converted_results is not None:
                     time_needed_for_db = self.dbs[settings.DB_NAME].write_to_db(converted_results)
-                    intervals[0] = intervals[0] - time_needed_for_db
+                    intervals[0] = intervals[0] - (time_needed_for_db / float(ONE_MINUTE_IN_SECONDS))
