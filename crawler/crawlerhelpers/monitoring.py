@@ -4,6 +4,7 @@ from crawler.logging import logfunctions
 from numpy import percentile
 from time import time
 from time import sleep
+from random import randint
 client = cloudant_db.get_client_session(settings.CLOUDANT_CRED_FILE)
 db = client.create_database(settings.MONITORING_DB_NAME, throw_on_exists=False)
 
@@ -63,7 +64,10 @@ def get_monitor_for_api(api_name):
 def save(monitor):
     if monitor.exists():
         # doing this to avoid htting the maximum requests per second limit
-        sleep(0.2)
-        monitor.save()
+        try:
+            monitor.save()
+        except HTTPError:
+            sleep(0.2 * randint(1, 5))
+            monitor.save()
     else:
         db.create_document(monitor)

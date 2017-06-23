@@ -5,7 +5,8 @@ import json
 import os
 from crawler.logging import logfunctions
 from time import sleep
-from multiprocessing import Queue
+# from multiprocessing import Queue
+from Queue import Queue
 # from multiprocessing import Pool
 from time import time
 
@@ -51,7 +52,7 @@ def work_queue(db, name, max_req_per_sec):
                 print 'could not write to db. Sleeping and try again'
                 data_upload_queue.put(data)
                 sleep(1.0 / max(1, max_req_per_sec - 1))
-                work_queue(db)
+                work_queue(db, name, max_req_per_sec)
         except Exception:
             logfunctions.warning('Data queue of {} emptied between check and access'
                                  .format(name))
