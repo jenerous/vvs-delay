@@ -70,4 +70,5 @@ def save(monitor):
             sleep(0.2 * randint(1, 5))
             monitor.save()
     else:
+        logfunctions.log('creating monitor database')
         db.create_document(monitor)

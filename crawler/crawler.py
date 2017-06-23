@@ -237,12 +237,15 @@ class Crawler(object):
             @param SIDs: station ids as list
         """
 
-        unique_intervals = np.array(self.intervals.keys(), dtype=np.int)
+        unique_intervals = np.array(self.intervals.keys(), dtype=float)
         unique_intervals = unique_intervals.reshape((1, unique_intervals.shape[0]))
         intervals = np.repeat(unique_intervals, 2, axis=0)
 
         for api in self.apis:
             monitoring.register_monitor_for_api(api)
+
+        tick = max(0, intervals[0].min())
+        intervals[0] = intervals[0] - tick
 
         while True:
             tick = max(0, intervals[0].min())

@@ -94,9 +94,20 @@ class API_efaBeta(object):
                         else:
                             info['content'] = ""
 
-                        info['title'] = st_event['infos'][i]['title']
-                        info['subtitle'] = st_event['infos'][i]['subtitle']
-                        info['properties'] = st_event['infos'][i]['properties']
+                        if 'title' in st_event['infos'][i]:
+                            info['title'] = st_event['infos'][i]['title']
+                        else:
+                            info['title'] = ""
+
+                        if 'subtitle' in st_event['infos'][i]:
+                            info['subtitle'] = st_event['infos'][i]['subtitle']
+                        else:
+                            info['subtitle'] = ""
+
+                        if 'properties' in st_event['infos'][i]:
+                            info['properties'] = st_event['infos'][i]['properties']
+                        else:
+                            info['properties'] = ""
                         departure_dict['infos'].append(info)
                 line = st_event['transportation']['number']
                 departure_dict['name'] = st_event['transportation']['product']['name']
